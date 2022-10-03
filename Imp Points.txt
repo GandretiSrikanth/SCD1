@@ -1,0 +1,56 @@
+set global local_infile=true;
+
+mysql --local-infile=1 -u root -p
+
+load data local infile '/home/saif/Day_1.csv' into table day1 fields terminated by ', ';
+
+nohup hive --service metastore &
+
+create table day1(custid bigint,username string,quote_count string,ip string,entry_time string,prp_1 string,
+prp_2 string,prp_3 string,ms string,http_type string,
+purchase_category string,total_count string,purchase_sub_category string,http_info string,status_code bigint)
+row format delimited fields by terminated by ',';
+
+create table day1(custid bigint,username string,quote_count string,ip string,entry_time string,prp_1 string,prp_2 string,prp_3 string,ms string,http_type string,purchase_category string,total_count string,purchase_sub_category string,http_info string,status_code bigint)row format delimited fields terminated by ',';
+
+insert overwrite table table_name select * from tablename;
+
+create table day1(custid bigint,username string,quote_count string,ip string,entry_time string,prp_1 string,prp_2 string,prp_3 string,ms string,http_type string,
+purchase_category string,total_count string,purchase_sub_category string,
+http_info string,status_code bigint) row format delimited fields by terminated by ',';
+
+create table day1_manual(custid bigint,username string,quote_count string,ip string,entry_time string,prp_1 string,prp_2 string,prp_3 string,ms string,http_type string,purchase_category string,total_count string,purchase_sub_category string,http_info string,status_code bigint)row format delimited fields terminated by ',';
+
+load data inpath 'sql/day1' into table day1_manual;
+
+create table day1_partition(custid bigint,username string,quote_count string,ip string,entry_time string,prp_1 string,prp_2 string,prp_3 string,ms string,http_type string,purchase_category string,total_count string,purchase_sub_category string,http_info string,status_code bigint) partitioned by (year string,month string)  row format delimited fields terminated by ',';
+
+insert overwrite day1_partition partition(year,month) select *,substr(entry_time,8,4) as year,substr(entry_time,month,4,3) as month from day1_manual;
+
+show partitions day1_partition;
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+#intermediate table (because partition table cannot directly imported)
+
+ create table day1_int(custid bigint, username string, quote_count string, ip string, entry_time string, prp_1 string,
+    prp_2 string, prp_3 string, ms string,
+    http_type string, purchase_category string, total_count string, purchase_sub_category string, 
+    http_info string, status_code bigint,year string,month string) row format delimited fields terminated by ',';
+
+
+insert overwrite table day1_int select * from day1_partition;
+
+
+#   hive   to  mysql  :
+
+
+ create table day1_hrep(custid bigint, username varchar(30), quote_count varchar(30), ip varchar(30), entry_time varchar(30), prp_1 varchar(30),
+    prp_2 varchar(30), prp_3 varchar(30), ms varchar(30),
+    http_type varchar(30), purchase_category varchar(30), total_count varchar(30), purchase_sub_category varchar(30), 
+    http_info text, status_code bigint,year varchar(30),month varchar(30));
+
+#export:
+
+
+sqoop export --connect jdbc:mysql://localhost:3306/project --table day1_hrep  --username root --password Welcome@123 
+--export-dir /user/hive/warehouse/day1_int
+

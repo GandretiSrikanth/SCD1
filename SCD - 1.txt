@@ -1,0 +1,11 @@
+SCD-1: Maintaining your Current Data
+
+Microsoft SQL Server Source:
+Table:
+ID 	NAME	CITY
+101	Saif	Pune
+
+Oracle Target:
+Table:
+ID	NAME	CITY 	STATUS
+101	Saif	Pune	Insert
